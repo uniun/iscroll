@@ -78,7 +78,7 @@ iScroll.prototype._initIndicators = function () {
 		this.indicator2 = new Indicator(this, indicator2);
 	}
 
-	this._addCustomEvent('refresh', function () {
+	this.on('refresh', function () {
 		if ( this.indicator1 ) {
 			this.indicator1.refresh();
 		}
@@ -88,7 +88,7 @@ iScroll.prototype._initIndicators = function () {
 		}
 	});
 
-	this._addCustomEvent('destroy', function () {
+	this.on('destroy', function () {
 		if ( this.indicator1 ) {
 			this.indicator1._destroy();
 		}

@@ -33,7 +33,7 @@ function iScroll (el, options) {
 		resizeIndicator: true,
 
 		snap: false,
-		snapThreshold: 10,
+		snapThreshold: 10
 	};
 
 	for ( var i in options ) {
@@ -314,7 +314,10 @@ iScroll.prototype._end = function (e) {
 		}
 
 		this.scrollTo(newX, newY, time, easing);
+		return;
 	}
+
+	this._execCustomEvent('scrollEnd');
 };
 
 iScroll.prototype._animate = function (destX, destY, duration, easingFn) {
@@ -409,6 +412,14 @@ iScroll.prototype.refresh = function () {
 	this.maxScrollX		= this.wrapperWidth - this.scrollerWidth;
 	this.maxScrollY		= this.wrapperHeight - this.scrollerHeight;
 
+	if ( this.maxScrollX > 0 ) {
+		this.maxScrollX = 0;
+	}
+
+	if ( this.maxScrollY > 0 ) {
+		this.maxScrollY = 0;
+	}
+
 	this.hasHorizontalScroll	= this.options.scrollX && this.maxScrollX < 0;
 	this.hasVerticalScroll		= this.options.scrollY && this.maxScrollY < 0;
 
@@ -417,7 +428,7 @@ iScroll.prototype.refresh = function () {
 	this._execCustomEvent('refresh');
 };
 
-iScroll.prototype._addCustomEvent = function (type, fn) {
+iScroll.prototype.on = function (type, fn) {
 	if ( !this._events[type] ) {
 		this._events[type] = [];
 	}

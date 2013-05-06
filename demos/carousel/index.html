@@ -17,9 +17,13 @@ function loaded () {
 		scrollX: true,
 		scrollY: false,
 		momentum: false,
-		snap: document.querySelectorAll('.slide'),
+		snap: true,
 		snapSpeed: 400,
-		bounceEasing: 'back'
+		bounceEasing: 'back',
+		indicators: {
+			el: document.getElementById('indicator'),
+			resize: false
+		}
 	});
 }
 
@@ -37,7 +41,7 @@ html {
 	-ms-touch-action: none;
 }
 
-body,ul,li {
+body, ul, li {
 	padding: 0;
 	margin: 0;
 	border: 0;
@@ -122,6 +126,22 @@ body {
 	background: url(warhol.jpg);
 }
 
+#indicator {
+	position: relative;
+	width: 110px;
+	height: 20px;
+	margin: 10px auto;
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAUBAMAAABohZD3AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUGCDYztyDUJgAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAGFBMVEUAAADNzc3Nzc3Nzc3Nzc3Nzc3Nzc3///8aWwwLAAAABnRSTlMAX5Ks3/nRD0HIAAAAAWJLR0QHFmGI6wAAAFtJREFUGFdjYGBgEHYNMWRAAJE0IHCEc5nSwEABxleD8JOgXMY0KBCA8FlgfAcIXwzGT4TwzWD8ZAjfDcZPgfDDYPxU7Hx09ejmoduH7h5096L7B8O/6OGBGl4APYg8TQ0XAScAAAAASUVORK5CYII=);
+}
+
+#dotty {
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	border-radius: 10px;
+	background: #777;
+}
+
 </style>
 </head>
 <body onload="loaded()">
@@ -143,6 +163,10 @@ body {
 			</div>
 		</div>
 	</div>
+</div>
+
+<div id="indicator">
+	<div id="dotty"></div>
 </div>
 
 </body>

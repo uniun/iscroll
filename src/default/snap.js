@@ -3,7 +3,7 @@ iScroll.prototype._initSnap = function () {
 	this.pages = [];
 	this.currentPage = {};
 
-	this._addCustomEvent('refresh', function () {
+	this.on('refresh', function () {
 		var i = 0, l,
 			m = 0, n,
 			cx, cy,
@@ -69,7 +69,7 @@ iScroll.prototype._initSnap = function () {
 
 		this.currentPage = {
 			x: this.pages[0][0].x,
-			x: this.pages[0][0].y,
+			y: this.pages[0][0].y,
 			pageX: 0,
 			pageY: 0
 		};

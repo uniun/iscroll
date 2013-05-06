@@ -20,8 +20,8 @@ iScroll.prototype._wheel = function (e) {
 		wheelDeltaX = wheelDeltaY;
 	}
 
-	newX = this.x + wheelDeltaX * this.options.invertWheelDirection;
-	newY = this.y + wheelDeltaY * this.options.invertWheelDirection;
+	newX = this.x + (this.hasHorizontalScroll ? wheelDeltaX * this.options.invertWheelDirection : 0);
+	newY = this.y + (this.hasVerticalScroll ? wheelDeltaY * this.options.invertWheelDirection : 0);
 
 	if ( newX > 0 ) {
 		newX = 0;

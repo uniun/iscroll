@@ -215,7 +215,7 @@ function iScroll (el, options) {
 		resizeIndicator: true,
 
 		snap: false,
-		snapThreshold: 10,
+		snapThreshold: 10
 	};
 
 	for ( var i in options ) {
@@ -496,7 +496,10 @@ iScroll.prototype._end = function (e) {
 		}
 
 		this.scrollTo(newX, newY, time, easing);
+		return;
 	}
+
+	this._execCustomEvent('scrollEnd');
 };
 
 iScroll.prototype._animate = function (destX, destY, duration, easingFn) {
@@ -591,6 +594,14 @@ iScroll.prototype.refresh = function () {
 	this.maxScrollX		= this.wrapperWidth - this.scrollerWidth;
 	this.maxScrollY		= this.wrapperHeight - this.scrollerHeight;
 
+	if ( this.maxScrollX > 0 ) {
+		this.maxScrollX = 0;
+	}
+
+	if ( this.maxScrollY > 0 ) {
+		this.maxScrollY = 0;
+	}
+
 	this.hasHorizontalScroll	= this.options.scrollX && this.maxScrollX < 0;
 	this.hasVerticalScroll		= this.options.scrollY && this.maxScrollY < 0;
 
@@ -599,7 +610,7 @@ iScroll.prototype.refresh = function () {
 	this._execCustomEvent('refresh');
 };
 
-iScroll.prototype._addCustomEvent = function (type, fn) {
+iScroll.prototype.on = function (type, fn) {
 	if ( !this._events[type] ) {
 		this._events[type] = [];
 	}
@@ -691,9 +702,8 @@ iScroll.prototype._initEvents = function (remove) {
 	eventType(this.scroller, 'MSTransitionEnd', this);
 
 	if ( this.options.mouseWheel ) {
-		eventType(this.scroller, 'wheel', this);
-		eventType(this.scroller, 'mousewheel', this);
-		//eventType(this.scroller, 'DOMMouseScroll', this);
+		eventType(this.wrapper, 'mousewheel', this);
+		eventType(this.wrapper, 'DOMMouseScroll', this);
 	}
 
 	if ( this.options.keyBindings ) {
@@ -804,8 +814,8 @@ iScroll.prototype._wheel = function (e) {
 		wheelDeltaX = wheelDeltaY;
 	}
 
-	newX = this.x + wheelDeltaX * this.options.invertWheelDirection;
-	newY = this.y + wheelDeltaY * this.options.invertWheelDirection;
+	newX = this.x + (this.hasHorizontalScroll ? wheelDeltaX * this.options.invertWheelDirection : 0);
+	newY = this.y + (this.hasVerticalScroll ? wheelDeltaY * this.options.invertWheelDirection : 0);
 
 	if ( newX > 0 ) {
 		newX = 0;
@@ -919,7 +929,7 @@ iScroll.prototype._initIndicators = function () {
 		this.indicator2 = new Indicator(this, indicator2);
 	}
 
-	this._addCustomEvent('refresh', function () {
+	this.on('refresh', function () {
 		if ( this.indicator1 ) {
 			this.indicator1.refresh();
 		}
@@ -929,7 +939,7 @@ iScroll.prototype._initIndicators = function () {
 		}
 	});
 
-	this._addCustomEvent('destroy', function () {
+	this.on('destroy', function () {
 		if ( this.indicator1 ) {
 			this.indicator1._destroy();
 		}
@@ -1184,7 +1194,7 @@ iScroll.prototype._initSnap = function () {
 	this.pages = [];
 	this.currentPage = {};
 
-	this._addCustomEvent('refresh', function () {
+	this.on('refresh', function () {
 		var i = 0, l,
 			m = 0, n,
 			cx, cy,
@@ -1250,7 +1260,7 @@ iScroll.prototype._initSnap = function () {
 
 		this.currentPage = {
 			x: this.pages[0][0].x,
-			x: this.pages[0][0].y,
+			y: this.pages[0][0].y,
 			pageX: 0,
 			pageY: 0
 		};
