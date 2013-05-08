@@ -1,4 +1,4 @@
-/*! iScroll v5.0.0-pre ~ (c) 2008-2013 Matteo Spinelli, http://cubiq.org ~ cubiq.org/license */
+/*! iScroll v5.0.0-pre ~ (c) 2008-2013 Matteo Spinelli ~ http://cubiq.org/license */
 var iScroll = (function (window, document, Math) {
 
 
@@ -663,6 +663,16 @@ iScroll.prototype._init = function () {
 };
 
 
+iScroll.prototype._transitionTime = function (time) {
+	time = time || 0;
+	this.scrollerStyle[utils.style.transitionDuration] = time + 'ms';
+};
+
+iScroll.prototype._transitionTimingFunction = function (easing) {
+	this.scrollerStyle[utils.style.transitionTimingFunction] = easing;
+};
+
+
 iScroll.prototype._initEvents = function (remove) {
 	var eventType = remove ? utils.removeEvent : utils.addEvent;
 
@@ -692,21 +702,6 @@ iScroll.prototype._initEvents = function (remove) {
 	eventType(this.scroller, 'webkitTransitionEnd', this);
 	eventType(this.scroller, 'oTransitionEnd', this);
 	eventType(this.scroller, 'MSTransitionEnd', this);
-
-	if ( this.options.mouseWheel ) {
-		eventType(this.wrapper, 'DOMMouseScroll', this);
-		eventType(this.wrapper, 'mousewheel', this);
-	}
-};
-
-
-iScroll.prototype._transitionTime = function (time) {
-	time = time || 0;
-	this.scrollerStyle[utils.style.transitionDuration] = time + 'ms';
-};
-
-iScroll.prototype._transitionTimingFunction = function (easing) {
-	this.scrollerStyle[utils.style.transitionTimingFunction] = easing;
 };
 
 

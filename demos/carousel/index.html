@@ -17,14 +17,17 @@ function loaded () {
 		scrollX: true,
 		scrollY: false,
 		momentum: false,
-		snap: true,
+		snap: document.querySelectorAll('#scroller .slide'),
 		snapSpeed: 400,
 		bounceEasing: 'back',
+		keyBindings: true,
 		indicators: {
 			el: document.getElementById('indicator'),
 			resize: false
 		}
 	});
+
+	setTimeout(function () { myScroll.goToPage(1, 0, 2000); }, 200);
 }
 
 document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);

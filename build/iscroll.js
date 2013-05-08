@@ -1,4 +1,4 @@
-/*! iScroll v5.0.0-pre ~ (c) 2008-2013 Matteo Spinelli, http://cubiq.org ~ cubiq.org/license */
+/*! iScroll v5.0.0-pre ~ (c) 2008-2013 Matteo Spinelli ~ http://cubiq.org/license */
 var iScroll = (function (window, document, Math) {
 
 
@@ -668,6 +668,13 @@ iScroll.prototype._init = function () {
 		this._initSnap();
 	}
 
+	if ( this.options.mouseWheel ) {
+		this._initWheel();
+	}
+
+	if ( this.options.keyBindings ) {
+		this._initKey();
+	}
 };
 
 
@@ -700,73 +707,6 @@ iScroll.prototype._initEvents = function (remove) {
 	eventType(this.scroller, 'webkitTransitionEnd', this);
 	eventType(this.scroller, 'oTransitionEnd', this);
 	eventType(this.scroller, 'MSTransitionEnd', this);
-
-	if ( this.options.mouseWheel ) {
-		eventType(this.wrapper, 'mousewheel', this);
-		eventType(this.wrapper, 'DOMMouseScroll', this);
-	}
-
-	if ( this.options.keyBindings ) {
-		eventType(window, 'keydown', this);
-	}
-};
-
-
-iScroll.prototype._key = function (e) {
-	var newX = this.x,
-		newY = this.y,
-		now = utils.getTime(),
-		prevTime = this.keyTime || 0,
-		acceleration = 0.125;
-
-	this.keyAcceleration = now - prevTime < 200 ? Math.min(this.keyAcceleration + acceleration, 50) : 0;
-
-	switch ( e.keyCode ) {
-		case 33:
-			newY += this.wrapperHeight;
-			break;
-		case 34:
-			newY -= this.wrapperHeight;
-			break;
-		case 35:
-			newY = this.maxScrollY;
-			break;
-		case 36:
-			newY = 0;
-			break;
-		case 37:
-			newX += 5 + this.keyAcceleration>>0;
-			break;
-		case 38:
-			newY += 5 + this.keyAcceleration>>0;
-			break;
-		case 39:
-			newX -= 5 + this.keyAcceleration>>0;
-			break;
-		case 40:
-			newY -= 5 + this.keyAcceleration>>0;
-			break;
-	}
-
-	if ( newX > 0 ) {
-		newX = 0;
-		this.keyAcceleration = 0;
-	} else if ( newX < this.maxScrollX ) {
-		newX = this.maxScrollX;
-		this.keyAcceleration = 0;
-	}
-
-	if ( newY > 0 ) {
-		newY = 0;
-		this.keyAcceleration = 0;
-	} else if ( newY < this.maxScrollY ) {
-		newY = this.maxScrollY;
-		this.keyAcceleration = 0;
-	}
-
-	this.scrollTo(newX, newY, 0);
-
-	this.keyTime = now;
 };
 
 
@@ -790,46 +730,6 @@ iScroll.prototype._translate = function (x, y) {
 	if ( this.indicator2 ) {
 		this.indicator2.updatePosition();
 	}
-};
-
-
-iScroll.prototype._wheel = function (e) {
-	var wheelDeltaX, wheelDeltaY,
-		newX, newY;
-
-	e.preventDefault();
-
-	if ( 'wheelDeltaX' in e ) {
-		wheelDeltaX = e.wheelDeltaX / 10;
-		wheelDeltaY = e.wheelDeltaY / 10;
-	} else if ( 'wheelDelta' in e ) {
-		wheelDeltaX = wheelDeltaY = e.wheelDelta / 10;
-	} else if ( 'detail' in e ) {
-		wheelDeltaX = wheelDeltaY = -e.detail * 3;
-	} else {
-		return;
-	}
-
-	if ( !this.hasVerticalScroll && wheelDeltaX === 0 ) {
-		wheelDeltaX = wheelDeltaY;
-	}
-
-	newX = this.x + (this.hasHorizontalScroll ? wheelDeltaX * this.options.invertWheelDirection : 0);
-	newY = this.y + (this.hasVerticalScroll ? wheelDeltaY * this.options.invertWheelDirection : 0);
-
-	if ( newX > 0 ) {
-		newX = 0;
-	} else if ( newX < this.maxScrollX ) {
-		newX = this.maxScrollX;
-	}
-
-	if ( newY > 0 ) {
-		newY = 0;
-	} else if ( newY < this.maxScrollY ) {
-		newY = this.maxScrollY;
-	}
-
-	this.scrollTo(newX, newY, 0);
 };
 
 
@@ -947,7 +847,7 @@ iScroll.prototype._initIndicators = function () {
 		if ( this.indicator2 ) {
 			this.indicator2._destroy();
 		}
-	});	
+	});
 };
 
 function Indicator (scroller, options) {
@@ -1190,6 +1090,124 @@ Indicator.prototype._pos = function (x, y) {
 };
 
 
+iScroll.prototype._initKey = function (e) {
+	// default key bindings
+	var keys = {
+		pageUp: 33,
+		pageDown: 34,
+		end: 35,
+		home: 36,
+		left: 37,
+		up: 38,
+		right: 39,
+		down: 40
+	};
+	var i;
+
+	// if you give me characters I give you keycode
+	if ( typeof this.options.keyBindings == 'object' ) {
+		for ( i in this.options.keyBindings ) {
+			if ( typeof this.options.keyBindings[i] == 'string' ) {
+				this.options.keyBindings[i] = this.options.keyBindings[i].toUpperCase().charCodeAt(0);
+			}
+		}
+	} else {
+		this.options.keyBindings = {};
+	}
+
+	for ( i in keys ) {
+		this.options.keyBindings[i] = this.options.keyBindings[i] || keys[i];
+	}
+
+	utils.addEvent(window, 'keydown', this);
+
+	this.on('destroy', function () {
+		utils.removeEvent(window, 'keydown', this);
+	});
+};
+
+iScroll.prototype._key = function (e) {
+	var snap = this.options.snap,	// we are using this alot, better to cache it
+		newX = snap ? this.currentPage.pageX : this.x,
+		newY = snap ? this.currentPage.pageY : this.y,
+		now = utils.getTime(),
+		prevTime = this.keyTime || 0,
+		acceleration = 0.250,
+		pos;
+
+	if ( this.options.useTransition && this.isInTransition ) {
+		pos = this.getComputedPosition();
+
+		this._translate(Math.round(pos.x), Math.round(pos.y));
+		this.isInTransition = false;
+	}
+
+	this.keyAcceleration = now - prevTime < 200 ? Math.min(this.keyAcceleration + acceleration, 50) : 0;
+
+	switch ( e.keyCode ) {
+		case this.options.keyBindings.pageUp:
+			if ( this.hasHorizontalScroll && !this.hasVerticalScroll ) {
+				newX += snap ? 1 : this.wrapperWidth;
+			} else {
+				newY += snap ? 1 : this.wrapperHeight;
+			}
+			break;
+		case this.options.keyBindings.pageDown:
+			if ( this.hasHorizontalScroll && !this.hasVerticalScroll ) {
+				newX -= snap ? 1 : this.wrapperWidth;
+			} else {
+				newY -= snap ? 1 : this.wrapperHeight;
+			}
+			break;
+		case this.options.keyBindings.end:
+			newX = snap ? this.pages.length-1 : this.maxScrollX;
+			newY = snap ? this.pages[0].length-1 : this.maxScrollY;
+			break;
+		case this.options.keyBindings.home:
+			newX = 0;
+			newY = 0;
+			break;
+		case this.options.keyBindings.left:
+			newX += snap ? -1 : 5 + this.keyAcceleration>>0;
+			break;
+		case this.options.keyBindings.up:
+			newY += snap ? 1 : 5 + this.keyAcceleration>>0;
+			break;
+		case this.options.keyBindings.right:
+			newX -= snap ? -1 : 5 + this.keyAcceleration>>0;
+			break;
+		case this.options.keyBindings.down:
+			newY -= snap ? 1 : 5 + this.keyAcceleration>>0;
+			break;
+	}
+
+	if ( snap ) {
+		this.goToPage(newX, newY);
+		return;
+	}
+
+	if ( newX > 0 ) {
+		newX = 0;
+		this.keyAcceleration = 0;
+	} else if ( newX < this.maxScrollX ) {
+		newX = this.maxScrollX;
+		this.keyAcceleration = 0;
+	}
+
+	if ( newY > 0 ) {
+		newY = 0;
+		this.keyAcceleration = 0;
+	} else if ( newY < this.maxScrollY ) {
+		newY = this.maxScrollY;
+		this.keyAcceleration = 0;
+	}
+
+	this.scrollTo(newX, newY, 0);
+
+	this.keyTime = now;
+};
+
+
 iScroll.prototype._initSnap = function () {
 	this.pages = [];
 	this.currentPage = {};
@@ -1326,6 +1344,59 @@ iScroll.prototype._nearestSnap = function (x, y) {
 	};
 };
 
+iScroll.prototype.goToPage = function (x, y, time, easing) {
+	if ( x >= this.pages.length ) {
+		x = this.pages.length - 1;
+	} else if ( x < 0) {
+		x = 0;
+	}
+
+	if ( y >= this.pages[0].length ) {
+		y = this.pages[0].length - 1;
+	} else if ( y < 0 ) {
+		y = 0;
+	}
+
+	var posX = this.pages[x][y].x,
+		posY = this.pages[x][y].y;
+
+	time = time || this.options.snapSpeed || Math.max(
+		Math.max(
+			Math.min(Math.abs(posX - this.x), 1000),
+			Math.min(Math.abs(posY - this.y), 1000)
+		),
+	300);
+
+	this.currentPage = {
+		x: posX,
+		y: posY,
+		pageX: x,
+		pageY: y
+	};
+
+	this.scrollTo(posX, posY, time, easing);
+};
+
+iScroll.prototype.next = function (time, easing) {
+	var x = this.currentPage.pageX,
+		y = this.currentPage.pageY;
+
+	x += this.hasHorizontalScroll ? 1 : 0;
+	y += this.hasVericalScroll ? 1 : 0;
+
+	this.goToPage(x, y, time, easing);
+};
+
+iScroll.prototype.prev = function (time, easing) {
+	var x = this.currentPage.pageX,
+		y = this.currentPage.pageY;
+
+	x -= this.hasHorizontalScroll ? 1 : 0;
+	y -= this.hasVericalScroll ? 1 : 0;
+
+	this.goToPage(x, y, time, easing);
+};
+
 
 iScroll.prototype._transitionTime = function (time) {
 	time = time || 0;
@@ -1350,6 +1421,62 @@ iScroll.prototype._transitionTimingFunction = function (easing) {
 	if ( this.indicator2 ) {
 		this.indicator2.transitionTimingFunction(easing);
 	}
+};
+
+
+iScroll.prototype._initWheel = function () {
+	utils.addEvent(this.wrapper, 'mousewheel', this);
+	utils.addEvent(this.wrapper, 'DOMMouseScroll', this);
+
+	this.on('destroy', function () {
+		utils.removeEvent(this.wrapper, 'mousewheel', this);
+		utils.removeEvent(this.wrapper, 'DOMMouseScroll', this);
+	});
+};
+
+iScroll.prototype._wheel = function (e) {
+	var wheelDeltaX, wheelDeltaY,
+		newX, newY,
+		that = this;
+
+	clearTimeout(this.wheelTimeout);
+	this.wheelTimeout = setTimeout(function () {
+		that._execCustomEvent('scrollEnd');
+	}, 500);
+
+	e.preventDefault();
+
+	if ( 'wheelDeltaX' in e ) {
+		wheelDeltaX = e.wheelDeltaX / 10;
+		wheelDeltaY = e.wheelDeltaY / 10;
+	} else if ( 'wheelDelta' in e ) {
+		wheelDeltaX = wheelDeltaY = e.wheelDelta / 10;
+	} else if ( 'detail' in e ) {
+		wheelDeltaX = wheelDeltaY = -e.detail * 3;
+	} else {
+		return;
+	}
+
+	if ( !this.hasVerticalScroll && wheelDeltaX === 0 ) {
+		wheelDeltaX = wheelDeltaY;
+	}
+
+	newX = this.x + (this.hasHorizontalScroll ? wheelDeltaX * this.options.invertWheelDirection : 0);
+	newY = this.y + (this.hasVerticalScroll ? wheelDeltaY * this.options.invertWheelDirection : 0);
+
+	if ( newX > 0 ) {
+		newX = 0;
+	} else if ( newX < this.maxScrollX ) {
+		newX = this.maxScrollX;
+	}
+
+	if ( newY > 0 ) {
+		newY = 0;
+	} else if ( newY < this.maxScrollY ) {
+		newY = this.maxScrollY;
+	}
+
+	this.scrollTo(newX, newY, 0);
 };
 
 

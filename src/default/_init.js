@@ -11,4 +11,11 @@ iScroll.prototype._init = function () {
 		this._initSnap();
 	}
 
+	if ( this.options.mouseWheel ) {
+		this._initWheel();
+	}
+
+	if ( this.options.keyBindings ) {
+		this._initKey();
+	}
 };

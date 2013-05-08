@@ -134,3 +134,56 @@ iScroll.prototype._nearestSnap = function (x, y) {
 		pageY: m
 	};
 };
+
+iScroll.prototype.goToPage = function (x, y, time, easing) {
+	if ( x >= this.pages.length ) {
+		x = this.pages.length - 1;
+	} else if ( x < 0) {
+		x = 0;
+	}
+
+	if ( y >= this.pages[0].length ) {
+		y = this.pages[0].length - 1;
+	} else if ( y < 0 ) {
+		y = 0;
+	}
+
+	var posX = this.pages[x][y].x,
+		posY = this.pages[x][y].y;
+
+	time = time || this.options.snapSpeed || Math.max(
+		Math.max(
+			Math.min(Math.abs(posX - this.x), 1000),
+			Math.min(Math.abs(posY - this.y), 1000)
+		),
+	300);
+
+	this.currentPage = {
+		x: posX,
+		y: posY,
+		pageX: x,
+		pageY: y
+	};
+
+	this.scrollTo(posX, posY, time, easing);
+};
+
+iScroll.prototype.next = function (time, easing) {
+	var x = this.currentPage.pageX,
+		y = this.currentPage.pageY;
+
+	x += this.hasHorizontalScroll ? 1 : 0;
+	y += this.hasVericalScroll ? 1 : 0;
+
+	this.goToPage(x, y, time, easing);
+};
+
+iScroll.prototype.prev = function (time, easing) {
+	var x = this.currentPage.pageX,
+		y = this.currentPage.pageY;
+
+	x -= this.hasHorizontalScroll ? 1 : 0;
+	y -= this.hasVericalScroll ? 1 : 0;
+
+	this.goToPage(x, y, time, easing);
+};

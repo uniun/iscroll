@@ -28,13 +28,4 @@ iScroll.prototype._initEvents = function (remove) {
 	eventType(this.scroller, 'webkitTransitionEnd', this);
 	eventType(this.scroller, 'oTransitionEnd', this);
 	eventType(this.scroller, 'MSTransitionEnd', this);
-
-	if ( this.options.mouseWheel ) {
-		eventType(this.wrapper, 'mousewheel', this);
-		eventType(this.wrapper, 'DOMMouseScroll', this);
-	}
-
-	if ( this.options.keyBindings ) {
-		eventType(window, 'keydown', this);
-	}
 };

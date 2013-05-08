@@ -4,7 +4,7 @@ module.exports = function (grunt) {
 
 		concat: {
 			options: {
-				banner: '/*! iScroll v<%= pkg.version %> ~ (c) 2008-<%= grunt.template.today("yyyy") %> Matteo Spinelli, http://cubiq.org ~ cubiq.org/license */\n'
+				banner: '/*! iScroll v<%= pkg.version %> ~ (c) 2008-<%= grunt.template.today("yyyy") %> Matteo Spinelli ~ http://cubiq.org/license */\n'
 			},
 
 			build: {
@@ -24,6 +24,7 @@ module.exports = function (grunt) {
 						'src/utils.js',
 						'src/core.js',
 						'src/lite/*.js',
+						'src/default/_initEvents.js',
 						'src/default/_translate.js',
 						'src/default/getComputedPosition.js',
 						'src/close.js'

@@ -96,7 +96,7 @@ iScroll.prototype._initIndicators = function () {
 		if ( this.indicator2 ) {
 			this.indicator2._destroy();
 		}
-	});	
+	});
 };
 
 function Indicator (scroller, options) {

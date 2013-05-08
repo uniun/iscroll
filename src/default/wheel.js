@@ -1,7 +1,23 @@
 
+iScroll.prototype._initWheel = function () {
+	utils.addEvent(this.wrapper, 'mousewheel', this);
+	utils.addEvent(this.wrapper, 'DOMMouseScroll', this);
+
+	this.on('destroy', function () {
+		utils.removeEvent(this.wrapper, 'mousewheel', this);
+		utils.removeEvent(this.wrapper, 'DOMMouseScroll', this);
+	});
+};
+
 iScroll.prototype._wheel = function (e) {
 	var wheelDeltaX, wheelDeltaY,
-		newX, newY;
+		newX, newY,
+		that = this;
+
+	clearTimeout(this.wheelTimeout);
+	this.wheelTimeout = setTimeout(function () {
+		that._execCustomEvent('scrollEnd');
+	}, 500);
 
 	e.preventDefault();
 

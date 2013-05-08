@@ -1,4 +1,4 @@
-/*! iScroll v5.0.0-pre ~ (c) 2008-2013 Matteo Spinelli, http://cubiq.org ~ cubiq.org/license */
+/*! iScroll v5.0.0-pre ~ (c) 2008-2013 Matteo Spinelli ~ http://cubiq.org/license */
 var iScroll = (function (window, document, Math) {
 
 
@@ -753,7 +753,7 @@ iScroll.prototype._initIndicators = function () {
 		if ( this.indicator2 ) {
 			this.indicator2._destroy();
 		}
-	});	
+	});
 };
 
 function Indicator (scroller, options) {
@@ -1034,6 +1034,13 @@ iScroll.prototype._init = function () {
 		this._initSnap();
 	}
 
+	if ( this.options.mouseWheel ) {
+		this._initWheel();
+	}
+
+	if ( this.options.keyBindings ) {
+		this._initKey();
+	}
 };
 
 
