@@ -85,7 +85,8 @@ var utils = (function () {
 	me.extend(me.style = {}, {
 		transform: _transform,
 		transitionTimingFunction: _prefixStyle('transitionTimingFunction'),
-		transitionDuration: _prefixStyle('transitionDuration')
+		transitionDuration: _prefixStyle('transitionDuration'),
+		transformOrigin: _prefixStyle('transformOrigin')
 	});
 
 	me.hasClass = function (e, c) {
@@ -110,6 +111,22 @@ var utils = (function () {
 
 		var re = new RegExp("(^|\\s)" + c + "(\\s|$)", 'g');
 		e.className = e.className.replace(re, '');
+	};
+
+	me.offset = function (el) {
+		var left = -el.offsetLeft,
+			top = -el.offsetTop;
+
+		// jshint -W084
+		while (el = el.offsetParent) {
+			left -= el.offsetLeft;
+			top -= el.offsetTop;
+		}
+
+		return {
+			left: left,
+			top: top
+		};
 	};
 
 	me.extend(me.eventType = {}, {

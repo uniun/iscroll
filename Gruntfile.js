@@ -7,13 +7,14 @@ module.exports = function (grunt) {
 				banner: '/*! iScroll v<%= pkg.version %> ~ (c) 2008-<%= grunt.template.today("yyyy") %> Matteo Spinelli ~ http://cubiq.org/license */\n'
 			},
 
-			build: {
+			iscroll: {
 				dest: 'build/iscroll.js',
 				src: [
 						'src/open.js',
 						'src/utils.js',
 						'src/core.js',
 						'src/default/*.js',
+						'src/move/*.js',
 						'src/close.js'
 					]
 			},
@@ -24,9 +25,21 @@ module.exports = function (grunt) {
 						'src/utils.js',
 						'src/core.js',
 						'src/lite/*.js',
+						'src/move/handleEvent.js',
 						'src/default/_initEvents.js',
 						'src/default/_translate.js',
 						'src/default/getComputedPosition.js',
+						'src/close.js'
+					]
+			},
+			zoom: {
+				dest: 'build/iscroll-zoom.js',
+				src: [
+						'src/open.js',
+						'src/utils.js',
+						'src/core.js',
+						'src/default/*.js',
+						'src/zoom/*.js',
 						'src/close.js'
 					]
 			},
@@ -36,6 +49,7 @@ module.exports = function (grunt) {
 						'src/open.js',
 						'src/utils.js',
 						'src/core.js',
+						'src/move/handleEvent.js',
 						'src/default/indicator.js',
 						'src/default/transitionProp.js',
 						'src/default/_init.js',
@@ -64,8 +78,8 @@ module.exports = function (grunt) {
 		},
 
 		watch: {
-			files: [ '<%= concat.build.src %>' ],
-			tasks: 'default'
+			files: [ 'src/**/*.js' ],
+			tasks: 'concat'
 		}
 	});
 
@@ -74,7 +88,9 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 
-	grunt.registerTask('default', ['concat:build']);
+	grunt.registerTask('iscroll', ['concat:iscroll']);
+	grunt.registerTask('lite', ['concat:lite']);
+	grunt.registerTask('zoom', ['concat:zoom']);
 	grunt.registerTask('iphone', ['concat:iphone']);
 	grunt.registerTask('dist', ['concat', 'jshint', 'uglify']);
 };

@@ -18,4 +18,8 @@ iScroll.prototype._init = function () {
 	if ( this.options.keyBindings ) {
 		this._initKey();
 	}
+
+	if ( this.options.zoom ) {
+		this._initZoom();
+	}
 };

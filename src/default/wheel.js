@@ -14,6 +14,7 @@ iScroll.prototype._wheel = function (e) {
 		newX, newY,
 		that = this;
 
+	// Execute the scroll end event after 500ms of wheel scrolling
 	clearTimeout(this.wheelTimeout);
 	this.wheelTimeout = setTimeout(function () {
 		that._execCustomEvent('scrollEnd');
@@ -27,7 +28,7 @@ iScroll.prototype._wheel = function (e) {
 	} else if ( 'wheelDelta' in e ) {
 		wheelDeltaX = wheelDeltaY = e.wheelDelta / 10;
 	} else if ( 'detail' in e ) {
-		wheelDeltaX = wheelDeltaY = -e.detail * 3;
+		wheelDeltaX = wheelDeltaY = -e.detail * 4;
 	} else {
 		return;
 	}

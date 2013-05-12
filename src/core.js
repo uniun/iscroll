@@ -33,7 +33,10 @@ function iScroll (el, options) {
 		resizeIndicator: true,
 
 		snap: false,
-		snapThreshold: 10
+		snapThreshold: 10,
+
+		zoomMin: 1,
+		zoomMax: 4
 	};
 
 	for ( var i in options ) {
@@ -64,6 +67,7 @@ function iScroll (el, options) {
 	this.x = 0;
 	this.y = 0;
 	this._events = {};
+	this.scale = 1;
 
 	this._init();
 	this.refresh();
@@ -71,48 +75,6 @@ function iScroll (el, options) {
 	this.scrollTo(this.options.startX, this.options.startY);
 	this.enable();
 }
-
-iScroll.prototype.handleEvent = function (e) {
-	switch ( e.type ) {
-		case 'touchstart':
-		case 'MSPointerDown':
-		case 'mousedown':
-			this._start(e);
-			break;
-		case 'touchmove':
-		case 'MSPointerMove':
-		case 'mousemove':
-			this._move(e);
-			break;
-		case 'touchend':
-		case 'MSPointerUp':
-		case 'mouseup':
-			this._end(e);
-			break;
-		case 'touchcancel':
-		case 'MSPointerCancel':
-		case 'mousecancel':
-			this._end(e);
-			break;
-		case 'orientationchange':
-		case 'resize':
-			this._resize();
-			break;
-		case 'transitionend':
-		case 'webkitTransitionEnd':
-		case 'oTransitionEnd':
-		case 'MSTransitionEnd':
-			this._transitionEnd(e);
-			break;
-		case 'DOMMouseScroll':
-		case 'mousewheel':
-			this._wheel(e);
-			break;
-		case 'keydown':
-			this._key(e);
-			break;
-	}
-};
 
 iScroll.prototype.destroy = function () {
 	this._initEvents(true);
@@ -257,6 +219,10 @@ iScroll.prototype._move = function (e) {
 iScroll.prototype._end = function (e) {
 	if ( !this.enabled || utils.eventType[e.type] !== this.initiated ) {
 		return;
+	}
+
+	if ( this.options.preventDefault ) {
+		e.preventDefault();
 	}
 
 	var point = e.changedTouches ? e.changedTouches[0] : e,
@@ -406,8 +372,8 @@ iScroll.prototype.refresh = function () {
 	this.wrapperWidth	= this.wrapper.clientWidth;
 	this.wrapperHeight	= this.wrapper.clientHeight;
 
-	this.scrollerWidth	= Math.round(this.scroller.offsetWidth);
-	this.scrollerHeight	= Math.round(this.scroller.offsetHeight);
+	this.scrollerWidth	= Math.round(this.scroller.offsetWidth * this.scale);
+	this.scrollerHeight	= Math.round(this.scroller.offsetHeight * this.scale);
 
 	this.maxScrollX		= this.wrapperWidth - this.scrollerWidth;
 	this.maxScrollY		= this.wrapperHeight - this.scrollerHeight;
