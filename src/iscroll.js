@@ -346,6 +346,11 @@ iScroll.prototype = {
 
 		if (!that.enabled) return;
 
+		if (e.target.tagName == "SELECT" || e.target.tagName == "INPUT"
+			|| e.target.tagName == "BUTTON" || e.target.tagName == "TEXTAREA") {
+			return true;
+		}
+
 		if (that.options.onBeforeScrollStart) that.options.onBeforeScrollStart.call(that, e);
 
 		if (that.options.useTransition || that.options.zoom) that._transitionTime(0);
@@ -655,11 +660,21 @@ iScroll.prototype = {
 			deltaX, deltaY,
 			deltaScale;
 
+		var wheelDistance = function(typ, det){
+			if (det){
+				if (typ) return typ/det/40*det>0?1:-1; // Opera
+				else return -det/3;              // Firefox;         TODO: do not /3 for OS X
+			} else return typ/120;             // IE/Safari/Chrome TODO: /3 for Chrome OS X
+		};
+
 		if ('wheelDeltaX' in e) {
-			wheelDeltaX = e.wheelDeltaX / 12;
-			wheelDeltaY = e.wheelDeltaY / 12;
+			//wheelDeltaX = e.wheelDeltaX / 12;
+			//wheelDeltaY = e.wheelDeltaY / 12;
+			wheelDeltaX = wheelDistance(e.wheelDeltaX, e.detail) * 10;
+			wheelDeltaY = wheelDistance(e.wheelDeltaY, e.detail) * 40; // FASTER!HARDER!
 		} else if('wheelDelta' in e) {
-			wheelDeltaX = wheelDeltaY = e.wheelDelta / 12;
+			//wheelDeltaX = wheelDeltaY = e.wheelDelta / 12;
+			wheelDeltaX = wheelDeltaY = wheelDistance(e.wheelDelta, e.detail) * 10;
 		} else if ('detail' in e) {
 			wheelDeltaX = wheelDeltaY = -e.detail * 3;
 		} else {
